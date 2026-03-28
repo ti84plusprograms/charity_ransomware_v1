@@ -232,6 +232,7 @@ All scripts are run via `npm run <script>`:
 | `build` | `next build` | Compile and optimize for production |
 | `start` | `next start` | Start the production server (requires a prior `build`) |
 | `lint` | `eslint` | Run ESLint on all TypeScript/TSX files using the flat config in `eslint.config.mjs` |
+| `test` | `jest` | Run the unit test suite (no API keys required — all tests run in mock mode) |
 
 ### Production build
 
@@ -360,7 +361,23 @@ The repository has a CI smoke-test workflow that runs on:
 
 ### Local Testing
 
-There is currently **no unit test suite** in the codebase. The `package.json` does not define a `test` script. To validate locally, run:
+Run the unit test suite with:
+
+```bash
+npm test
+```
+
+All tests run in **mock mode** — no API keys are required. The suite covers:
+
+| Area | What is tested |
+|---|---|
+| `agents/coach` | `getCoachMessage()` and `getTabReturnMessage()` return valid strings |
+| `agents/roastmaster` | Functions throw the correct error when `GEMINI_API_KEY` is absent |
+| `GET /api/charities` | 400 on missing `city` param; returns 4 mock charities with correct fields in mock mode |
+| `POST /api/shoutout` | Fallback messages for `roast`/`letter` types; success response for `send`; 400 for unknown type |
+| `lib/state` | Zustand store actions (`setUserName`, `incrementIronyScore`, `incrementTabSwitchCount`, `setSelectedCharity`, `setRecommendationLetter`) behave correctly |
+
+Additionally, you can run these static checks:
 
 ```bash
 # Lint check
@@ -368,16 +385,6 @@ npm run lint
 
 # Production build (catches TypeScript errors + invalid imports)
 npm run build
-```
-
-A successful `npm run build` output looks like:
-```
-✓ Compiled successfully
-✓ Linting and checking validity of types
-Route (app)              Size     First Load JS
-┌ ○ /                   ...
-├ ○ /booth              ...
-└ ○ /campaign           ...
 ```
 
 ---
