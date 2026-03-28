@@ -31,8 +31,8 @@ export async function processHeroShot(options: UGCEngineOptions): Promise<UGCRes
 
   ffmpeg.FS("writeFile", inputFile, await fetchFile(options.heroShot));
 
-  const safeCharity = options.charityName.replace(/'/g, "\\'");
-  const safeUser = options.userName.replace(/'/g, "\\'");
+  const safeCharity = options.charityName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  const safeUser = options.userName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   
   await ffmpeg.run(
     "-i", inputFile,
