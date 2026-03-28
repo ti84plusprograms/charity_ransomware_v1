@@ -31,8 +31,12 @@ export async function processHeroShot(options: UGCEngineOptions): Promise<UGCRes
 
   ffmpeg.FS("writeFile", inputFile, await fetchFile(options.heroShot));
 
-  const safeCharity = options.charityName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-  const safeUser = options.userName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  const sanitizeForDrawtext = (text: string) =>
+    text.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/:/g, "\\:");
+
+  const safeCharity = sanitizeForDrawtext(options.charityName);
+  const safeUser = sanitizeForDrawtext(options.userName);
+  const safeCity = sanitizeForDrawtext(options.city);
   
   await ffmpeg.run(
     "-i", inputFile,
@@ -40,7 +44,7 @@ export async function processHeroShot(options: UGCEngineOptions): Promise<UGCRes
     "-vf",
     [
       `drawtext=text='${safeCharity}':fontcolor=white:fontsize=28:x=(w-text_w)/2:y=30:box=1:boxcolor=black@0.6:boxborderw=8`,
-      `drawtext=text='${safeUser} says\\: Volunteer in ${options.city}!':fontcolor=yellow:fontsize=18:x=(w-text_w)/2:y=h-60:box=1:boxcolor=black@0.6:boxborderw=5`,
+      `drawtext=text='${safeUser} says\\: Volunteer in ${safeCity}!':fontcolor=yellow:fontsize=18:x=(w-text_w)/2:y=h-60:box=1:boxcolor=black@0.6:boxborderw=5`,
     ].join(","),
     "-c:v", "libx264",
     "-preset", "ultrafast",

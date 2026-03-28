@@ -8,7 +8,11 @@ interface RoastContext {
 }
 
 export async function generateRoast(context: RoastContext): Promise<string> {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is not set.");
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `You are "The Aggressive Recruiter" - a satirical AI persona that uses witty, sarcastic roast-style humor to encourage people to volunteer for local charities. Be funny and self-deprecating, never cruel or harassing.
@@ -26,7 +30,11 @@ Generate a short (2-3 sentences), witty roast-style message encouraging them to 
 }
 
 export async function generateRecommendationLetter(context: RoastContext): Promise<string> {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is not set.");
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `You are "The Aggressive Recruiter" writing a hilariously self-deprecating "Recommendation Letter" from ${context.userName || "a reluctant hero"} to a friend, encouraging them to volunteer at ${context.charityName || "a local charity"} in ${context.city || "their city"}.

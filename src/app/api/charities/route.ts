@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
+interface PlaceResult {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+  rating?: number;
+}
+
+interface PlacesResponse {
+  status: string;
+  results: PlaceResult[];
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const city = searchParams.get("city");
@@ -19,14 +31,13 @@ export async function GET(request: NextRequest) {
     const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${apiKey}`;
     
     const response = await fetch(url);
-    const data = await response.json();
+    const data: PlacesResponse = await response.json();
 
     if (data.status !== "OK" && data.status !== "ZERO_RESULTS") {
       throw new Error(`Places API error: ${data.status}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const results = (data.results || []).slice(0, 8).map((place: any) => ({
+    const results = (data.results || []).slice(0, 8).map((place: PlaceResult) => ({
       id: place.place_id,
       name: place.name,
       address: place.formatted_address,

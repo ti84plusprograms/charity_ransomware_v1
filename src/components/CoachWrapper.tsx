@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useEngagement } from "@/hooks/useEngagement";
 
 interface CoachNotification {
@@ -11,15 +11,27 @@ interface CoachNotification {
 
 export function CoachWrapper({ children }: { children: React.ReactNode }) {
   const [notification, setNotification] = useState<CoachNotification | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleNotificationClear = (delay: number) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setNotification(null), delay);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   useEngagement({
     onTabHidden: (message, emoji) => {
       setNotification({ message, emoji, type: "warning" });
-      setTimeout(() => setNotification(null), 5000);
+      scheduleNotificationClear(5000);
     },
     onTabVisible: (message) => {
       setNotification({ message, emoji: "👋", type: "welcome" });
-      setTimeout(() => setNotification(null), 3000);
+      scheduleNotificationClear(3000);
     },
   });
 

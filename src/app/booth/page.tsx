@@ -21,7 +21,17 @@ export default function BoothPage() {
 
   const startRecording = useCallback((stream: MediaStream) => {
     chunksRef.current = [];
-    const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+      ? "video/webm;codecs=vp9"
+      : MediaRecorder.isTypeSupported("video/webm")
+      ? "video/webm"
+      : "";
+    if (!mimeType) {
+      setError("Your browser does not support video recording. Please try Chrome or Firefox.");
+      setState("idle");
+      return;
+    }
+    const mediaRecorder = new MediaRecorder(stream, { mimeType });
     mediaRecorderRef.current = mediaRecorder;
 
     mediaRecorder.ondataavailable = (e) => {
@@ -29,7 +39,7 @@ export default function BoothPage() {
     };
 
     mediaRecorder.onstop = async () => {
-      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      const blob = new Blob(chunksRef.current, { type: mimeType });
       setState("processing");
       
       try {

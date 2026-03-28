@@ -11,7 +11,7 @@ interface UseEngagementOptions {
 
 export function useEngagement(options: UseEngagementOptions = {}) {
   const { incrementTabSwitchCount, tabSwitchCount } = useSessionStore();
-  const hasHiddenRef = useRef(false);
+  const wasHiddenRef = useRef(false);
   const optionsRef = useRef(options);
 
   useEffect(() => {
@@ -20,11 +20,11 @@ export function useEngagement(options: UseEngagementOptions = {}) {
 
   const handleVisibilityChange = useCallback(() => {
     if (document.hidden) {
-      hasHiddenRef.current = true;
+      wasHiddenRef.current = true;
       incrementTabSwitchCount();
       const coachMsg = getCoachMessage();
       optionsRef.current.onTabHidden?.(coachMsg.message, coachMsg.emoji);
-    } else if (hasHiddenRef.current) {
+    } else if (wasHiddenRef.current) {
       const returnMsg = getTabReturnMessage();
       optionsRef.current.onTabVisible?.(returnMsg);
     }
