@@ -16,7 +16,7 @@ export function useEngagement(options: UseEngagementOptions = {}) {
 
   useEffect(() => {
     optionsRef.current = options;
-  });
+  }, [options]);
 
   const handleVisibilityChange = useCallback(() => {
     if (document.hidden) {

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
   if (type === "send") {
     console.log(`Shout-out email would be sent to: ${recipientEmail}`);
-    void letter; // acknowledged
+    // letter is received but email sending is not yet implemented
     return NextResponse.json({ success: true, message: "Shout-out queued!" });
   }
 
